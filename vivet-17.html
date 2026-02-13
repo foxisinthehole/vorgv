@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organizational Structure - COO Operating Model</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px;
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 5px;
+            font-size: 24px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        .chart-wrapper {
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: #f7fafc;
+            padding: 30px;
+            overflow: auto;
+        }
+
+        .chart {
+            min-width: 1800px;
+        }
+
+        .org-chart {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            width: 100%;
+            position: relative;
+        }
+
+        /* Visual grouping container */
+        .coo-group {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(240, 147, 251, 0.08) 0%, rgba(245, 87, 108, 0.08) 100%);
+            border-radius: 12px;
+            border: 2px dashed rgba(240, 147, 251, 0.3);
+            position: relative;
+        }
+
+        .coo-group::before {
+            content: 'Reports to COO';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 4px 12px;
+            font-size: 10px;
+            color: #f093fb;
+            font-weight: 600;
+            border-radius: 12px;
+            border: 1px solid rgba(240, 147, 251, 0.3);
+        }
+
+        .department-column {
+            display: flex;
+            flex-direction: column;
+            min-width: 220px;
+            max-width: 240px;
+            flex: 1;
+        }
+
+        .node {
+            background: white;
+            border: 2px solid #cbd5e0;
+            border-radius: 6px;
+            padding: 8px 14px;
+            margin: 4px 0;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .node:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .node.ceo {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 18px 24px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .node.coo {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            font-weight: bold;
+            font-size: 16px;
+            padding: 18px 24px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(240, 147, 251, 0.4);
+        }
+
+        /* C-Level executives reporting to COO - matching color scheme */
+        .node.c-level-coo-reports {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            border: none;
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 12px;
+            padding: 14px 18px;
+            box-shadow: 0 3px 10px rgba(240, 147, 251, 0.3);
+        }
+
+        .node.director {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            border: none;
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+
+        .node.head {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: #1a202c;
+            border: none;
+            font-weight: 600;
+            font-size: 12px;
+            margin-bottom: 8px;
+        }
+
+        .node.manager {
+            background: #edf2f7;
+            border-color: #a0aec0;
+            color: #2d3748;
+            font-weight: 500;
+            font-size: 11px;
+        }
+
+        .node.team {
+            background: white;
+            border-color: #cbd5e0;
+            color: #4a5568;
+            font-size: 10px;
+            padding: 6px 12px;
+        }
+
+        .node-title {
+            font-weight: inherit;
+            font-size: inherit;
+        }
+
+        .node-subtitle {
+            font-size: 10px;
+            opacity: 0.9;
+            margin-top: 3px;
+            font-style: italic;
+        }
+
+        .team-group {
+            margin-left: 15px;
+            padding-left: 12px;
+            border-left: 2px solid #e2e8f0;
+        }
+
+        .sub-department {
+            margin-left: 15px;
+            padding-left: 15px;
+            border-left: 3px solid #cbd5e0;
+            margin-top: 10px;
+        }
+
+        .section-divider {
+            margin: 10px 0 6px 0;
+            padding: 5px;
+            background: #f7fafc;
+            border-radius: 4px;
+            font-size: 9px;
+            color: #718096;
+            text-align: center;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            padding: 12px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+        }
+
+        .legend-box {
+            width: 24px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        /* Reporting line indicator */
+        .reporting-indicator {
+            font-size: 9px;
+            color: #f093fb;
+            font-weight: 600;
+            margin-top: 5px;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Complete Organizational Structure</h1>
+        <p class="subtitle">VIVET COMPANY LLC - COO Operating Model</p>
+
+        <div class="chart-wrapper">
+            <div class="chart">
+                <div class="org-chart">
+                    
+                    <!-- Column 1: CEO -->
+                    <div class="department-column">
+                        <div class="node ceo">
+                            <div class="node-title">FOUNDER / CEO</div>
+                            <div class="node-subtitle">Vision • Brand • Capital • Strategy</div>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: COO + Operations -->
+                    <div class="department-column">
+                        <div class="node coo">
+                            <div class="node-title">Chief Operating Officer</div>
+                            <div class="node-subtitle">Day-to-Day Operations</div>
+                        </div>
+                        <div class="reporting-indicator">↑ Reports to CEO</div>
+
+                        <!-- Operations Section under COO -->
+                        <div class="section-divider">Production</div>
+                        <div class="node manager">Production Manager</div>
+                        <div class="node manager">Vendor/Factory Relations</div>
+                        <div class="node manager">Quality Control</div>
+
+                        <div class="section-divider">Planning</div>
+                        <div class="node manager">Inventory Planning</div>
+                        <div class="node manager">Demand Forecasting</div>
+                        <div class="node manager">Supply Chain</div>
+
+                        <div class="section-divider">Logistics</div>
+                        <div class="node manager">Logistics Manager</div>
+                        <div class="node manager">Warehouse Manager</div>
+                        <div class="node manager">Fulfillment + Returns</div>
+
+                        <div class="section-divider">Business Development</div>
+                        <div class="node head">
+                            <div class="node-title">Head of Partnerships/BD</div>
+                        </div>
+                        <div class="team-group">
+                            <div class="node team">Retail Partnerships</div>
+                            <div class="node team">Wholesale</div>
+                            <div class="node team">Collaborations</div>
+                            <div class="node team">Licensing</div>
+                        </div>
+                    </div>
+
+                    <!-- COO Reports Group (CPO, CMO, CFO) -->
+                    <div class="coo-group">
+                        <!-- Column 3: Chief Product Officer -->
+                        <div class="department-column">
+                            <div class="node c-level-coo-reports">
+                                <div class="node-title">Chief Product Officer</div>
+                                <div class="node-subtitle">Product & Design</div>
+                            </div>
+
+                            <div class="section-divider">Design Team</div>
+                            <div class="node head">Head of Design</div>
+                            <div class="team-group">
+                                <div class="node team">Apparel Designers</div>
+                                <div class="node team">Technical Designer</div>
+                                <div class="node team">Pattern Makers</div>
+                            </div>
+
+                            <div class="section-divider">Product Development</div>
+                            <div class="node manager">Product Development Manager</div>
+                            <div class="node manager">Fabric & Trim Sourcing</div>
+                            <div class="node manager">Sample Room</div>
+
+                            <div class="section-divider">Creative Team</div>
+                            <div class="node head">Art Director</div>
+                            <div class="team-group">
+                                <div class="node team">Graphic Designer</div>
+                                <div class="node team">Photographer</div>
+                                <div class="node team">Videographer</div>
+                                <div class="node team">Stylist</div>
+                            </div>
+                        </div>
+
+                        <!-- Column 4: Chief Marketing Officer -->
+                        <div class="department-column">
+                            <div class="node c-level-coo-reports">
+                                <div class="node-title">Chief Marketing Officer</div>
+                                <div class="node-subtitle">Marketing & Growth</div>
+                            </div>
+
+                            <div class="section-divider">Brand & Content</div>
+                            <div class="node manager">Brand Marketing</div>
+                            <div class="node manager">Social Media Manager</div>
+                            <div class="node manager">Content Team</div>
+
+                            <div class="section-divider">Partnerships</div>
+                            <div class="node manager">Influencer Manager</div>
+                            <div class="node manager">Affiliate Manager</div>
+                            <div class="node manager">Paid Ads Manager</div>
+
+                            <div class="section-divider">Engagement</div>
+                            <div class="node manager">Email/SMS (CRM)</div>
+                            <div class="node manager">PR</div>
+                            <div class="node manager">Community</div>
+
+                            <!-- E-Commerce as sub-department under CMO -->
+                            <div class="sub-department">
+                                <div class="section-divider">E-Commerce</div>
+                                <div class="node director">
+                                    <div class="node-title">E-Commerce Director</div>
+                                </div>
+
+                                <div class="team-group">
+                                    <div class="node manager">Shopify/Site Manager</div>
+                                    <div class="node manager">Web Developer</div>
+                                    <div class="node manager">UX/UI Designer</div>
+                                    <div class="node manager">CRO Specialist</div>
+                                    <div class="node manager">Merchandising Manager</div>
+                                    <div class="node manager">Product Uploads</div>
+                                    <div class="node manager">Data & Analytics</div>
+                                </div>
+
+                                <!-- Customer Experience under E-Commerce -->
+                                <div class="section-divider" style="margin-top: 15px;">Customer Experience</div>
+                                <div class="node head">
+                                    <div class="node-title">Head of Customer Experience</div>
+                                </div>
+                                <div class="team-group">
+                                    <div class="node team">Support Team</div>
+                                    <div class="node team">Returns/Exchanges</div>
+                                    <div class="node team">Loyalty/Retention</div>
+                                    <div class="node team">Reviews/UGC</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Column 5: Chief Finance Officer -->
+                        <div class="department-column">
+                            <div class="node c-level-coo-reports">
+                                <div class="node-title">Chief Finance Officer</div>
+                                <div class="node-subtitle">Finance</div>
+                            </div>
+                            <div class="team-group">
+                                <div class="node team">Accounting</div>
+                                <div class="node team">Forecasting</div>
+                                <div class="node team">Payroll</div>
+                                <div class="node team">Legal/Compliance</div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                <span>CEO/Founder</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);"></div>
+                <span>COO & Direct Reports (CPO, CMO, CFO)</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);"></div>
+                <span>Directors</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"></div>
+                <span>Department Heads</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #edf2f7; border: 1px solid #a0aec0;"></div>
+                <span>Managers</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: white; border: 1px solid #cbd5e0;"></div>
+                <span>Team Members</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add click interaction for nodes
+        document.querySelectorAll('.node').forEach(node => {
+            node.addEventListener('click', function() {
+                const isExpanded = this.style.transform && this.style.transform.includes('scale');
+                document.querySelectorAll('.node').forEach(n => n.style.transform = '');
+                if (!isExpanded) {
+                    this.style.transform = 'scale(1.05) translateY(-2px)';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
